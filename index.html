@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#1a7a4a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<title>Registro Ripetizioni</title>
+<style>
+:root{--g:#1a7a4a;--gd:#145c38;--gl:#e8f5ee;--r:#e53935;--rl:#ffebee;--o:#f57c00;--ol:#fff3e0;--bg:#f0f4f0;--card:#fff;--text:#1a2e1a;--muted:#6b7c6b;--border:#dde8dd;--nav:60px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif}
+body{background:var(--bg);color:var(--text);padding-bottom:var(--nav)}
+.topbar{background:var(--g);color:#fff;padding:13px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.topbar h1{font-size:17px;font-weight:700;flex:1}
+.topbar-btn{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:2px 6px;line-height:1}
+.nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:#fff;border-top:1px solid var(--border);display:flex;z-index:100}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--muted);font-size:10px;font-weight:500;cursor:pointer}
+.nav-btn.on{color:var(--g)}
+.nav-btn span{font-size:21px;line-height:1}
+.screen{display:none}
+.screen.on{display:block;animation:fi .18s ease}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border-radius:14px;padding:15px;margin:10px 12px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.ctitle{font-size:13px;font-weight:700;color:var(--g);margin-bottom:11px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 12px}
+.stat{background:#fff;border-radius:12px;padding:13px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.stat .v{font-size:22px;font-weight:800}
+.stat .v.gr{color:var(--g)}.stat .v.re{color:var(--r)}
+.stat .l{font-size:11px;color:var(--muted);margin-top:3px}
+.li{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid #f0f5f0;gap:10px}
+.li:last-child{border:none}
+.av{width:38px;height:38px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--g);flex-shrink:0}
+.in{flex:1;min-width:0}
+.nm{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb{font-size:12px;color:var(--muted);margin-top:2px}
+.bdg{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700}
+.bg{background:var(--gl);color:var(--gd)}.br{background:var(--rl);color:var(--r)}
+.bo{background:var(--ol);color:var(--o)}.bb{background:#e3f2fd;color:#1565c0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer}
+.btn-p{background:var(--g);color:#fff}.btn-o{background:transparent;border:2px solid var(--g);color:var(--g)}
+.btn-r{background:var(--r);color:#fff}.btn-w{width:100%}.btn-s{padding:7px 12px;font-size:12px}
+.fg{margin-bottom:13px}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.fc{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;background:#fff;outline:none;-webkit-appearance:none;appearance:none}
+.fc:focus{border-color:var(--g)}
+select.fc{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M0 0l5 7 5-7z' fill='%236b7c6b'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:32px}
+.fab{position:fixed;bottom:calc(var(--nav) + 14px);right:15px;width:54px;height:54px;border-radius:50%;background:var(--g);color:#fff;font-size:26px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(26,122,74,.4);z-index:99}
+.sheet-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-end}
+.sheet-bg.on{display:flex}
+.sheet{background:#fff;border-radius:20px 20px 0 0;padding:18px 16px 22px;width:100%;max-height:90vh;overflow-y:auto}
+.handle{width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 14px}
+.sh-title{font-size:17px;font-weight:700;margin-bottom:18px}
+.chip-row{display:flex;gap:7px;padding:8px 12px;overflow-x:auto;scrollbar-width:none}
+.chip-row::-webkit-scrollbar{display:none}
+.chip{padding:6px 13px;border-radius:20px;font-size:13px;font-weight:500;white-space:nowrap;border:1.5px solid var(--border);color:var(--muted);background:#fff;cursor:pointer}
+.chip.on{background:var(--g);color:#fff;border-color:var(--g)}
+.sec-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:14px 16px 6px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ck-row{display:flex;align-items:center;gap:10px;padding:4px 0}
+.ck-row input[type=checkbox]{width:20px;height:20px;accent-color:var(--g)}
+.wa-box{background:#e7fbe9;border:1.5px solid #a5d6a7;border-radius:11px;padding:13px;font-family:monospace;font-size:13px;line-height:1.9;white-space:pre-wrap;word-break:break-word}
+.mon-hdr{background:var(--g);color:#fff;padding:11px 15px;font-size:15px;font-weight:700;margin:10px 12px 0;border-radius:12px}
+.mon-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0f5f0;font-size:13px}
+.mon-row:last-child{border:none}
+.mon-row .ml{color:var(--muted)}.mon-row .mv{font-weight:600}
+.mv.re{color:var(--r)}.mv.gr{color:var(--g)}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .ei{font-size:42px;margin-bottom:10px}
+.flash{padding:10px 15px;margin:6px 12px;border-radius:10px;font-size:13px;font-weight:500}
+.flash.ok{background:var(--gl);color:var(--gd)}.flash.err{background:var(--rl);color:var(--r)}
+.actions{display:flex;gap:8px;margin-top:14px}
+</style>
+</head>
+<body>
+<div id="flash-area"></div>
+
+<!-- HOME -->
+<div class="screen on" id="s-home">
+  <div class="topbar"><h1>📚 Registro Ripetizioni</h1><button class="topbar-btn" onclick="showSheet('sh-impexp')" title="Import/Export">⚙️</button></div>
+  <div class="stats">
+    <div class="stat"><div class="v gr" id="h-nalunni">0</div><div class="l">Alunni attivi</div></div>
+    <div class="stat"><div class="v re" id="h-dpag">€0</div><div class="l">Da incassare</div></div>
+  </div>
+  <div class="sec-title">Prossime lezioni</div>
+  <div class="card" id="h-prog-card"><div class="empty"><div class="ei">📅</div><p>Nessuna lezione programmata</p></div></div>
+  <div class="sec-title">Ultime lezioni</div>
+  <div class="card" id="h-lez-card"><div class="empty"><div class="ei">📚</div><p>Nessuna lezione ancora</p></div></div>
+  <div class="card">
+    <div class="ctitle">Accesso rapido</div>
+    <div class="row2">
+      <button class="btn btn-p" onclick="showSheet('sh-addlez')">+ Lezione</button>
+      <button class="btn btn-o" onclick="showSheet('sh-addprog')">+ Agenda</button>
+    </div>
+  </div>
+</div>
+
+<!-- ALUNNI -->
+<div class="screen" id="s-alunni">
+  <div class="topbar"><h1>👥 Alunni</h1></div>
+  <div class="card" id="alunni-list"></div>
+  <button class="fab" onclick="showSheet('sh-addalunno')">+</button>
+</div>
+
+<!-- LEZIONI -->
+<div class="screen" id="s-lezioni">
+  <div class="topbar"><h1>📚 Lezioni</h1></div>
+  <div class="chip-row" id="lez-chips"></div>
+  <div class="card" id="lez-list"></div>
+  <button class="fab" onclick="showSheet('sh-addlez')">+</button>
+</div>
+
+<!-- AGENDA -->
+<div class="screen" id="s-agenda">
+  <div class="topbar"><h1>📅 Agenda</h1></div>
+  <div class="card" id="prog-list"></div>
+  <button class="fab" onclick="showSheet('sh-addprog')">+</button>
+</div>
+
+<!-- REPORT -->
+<div class="screen" id="s-report">
+  <div class="topbar"><h1>📊 Report</h1></div>
+  <div class="chip-row">
+    <div class="chip on" id="chip-mens" onclick="showTab('r-mens',this)">📅 Mensile</div>
+    <div class="chip" id="chip-pag" onclick="showTab('r-pag',this)">💰 Da pagare</div>
+  </div>
+  <div id="r-mens">
+    <div class="card"><select class="fc" id="mese-sel" onchange="renderMensile()"></select></div>
+    <div id="mensile-content"></div>
+  </div>
+  <div id="r-pag" style="display:none"><div id="pagare-content"></div></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn on" onclick="goTo('home',this)"><span>🏠</span>Home</button>
+  <button class="nav-btn" onclick="goTo('alunni',this)"><span>👥</span>Alunni</button>
+  <button class="nav-btn" onclick="goTo('lezioni',this)"><span>📚</span>Lezioni</button>
+  <button class="nav-btn" onclick="goTo('agenda',this)"><span>📅</span>Agenda</button>
+  <button class="nav-btn" onclick="goTo('report',this)"><span>📊</span>Report</button>
+</nav>
+
+<!-- SHEET: Alunno -->
+<div class="sheet-bg" id="sh-addalunno" onclick="closeOnBg(event,this)">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sh-title" id="alunno-sh-title">Nuovo alunno</div>
+    <input type="hidden" id="edit-alunno-id">
+    <div class="fg"><label>Nome</label><input class="fc" id="a-nome" placeholder="Es. Mario Rossi"></div>
+    <div class="fg"><label>Tariffa oraria (€)</label><input class="fc" id="a-tariffa" type="number" step="0.5" placeholder="15"></div>
+    <div class="fg"><label>Materia (opzionale)</label><input class="fc" id="a-materia" placeholder="Es. Matematica"></div>
+    <div class="actions">
+      <button class="btn btn-r btn-s" id="btn-del-alunno" style="display:none" onclick="deleteAlunno()">Elimina</button>
+      <button class="btn btn-o" onclick="hideSheet('sh-addalunno')" style="flex:1">Annulla</button>
+      <button class="btn btn-p" onclick="saveAlunno()" style="flex:1">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET: Lezione -->
+<div class="sheet-bg" id="sh-addlez" onclick="closeOnBg(event,this)">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sh-title" id="lez-sh-title">Nuova lezione</div>
+    <input type="hidden" id="edit-lez-id">
+    <div class="fg"><label>Alunno</label><select class="fc" id="l-alunno"><option value="">Scegli alunno...</option></select></div>
+    <div class="row2">
+      <div class="fg"><label>Data</label><input class="fc" id="l-data" type="date"></div>
+      <div class="fg"><label>Ora (opz.)</label><input class="fc" id="l-ora" type="time"></div>
+    </div>
+    <div class="fg"><label>Ore</label><input class="fc" id="l-ore" type="number" step="0.5" placeholder="Es. 1.5"></div>
+    <div class="fg"><label>Note (opzionale)</label><input class="fc" id="l-note" placeholder="Es. Equazioni"></div>
+    <div class="ck-row"><input type="checkbox" id="l-pagato"><label for="l-pagato" style="font-size:14px">Già pagata</label></div>
+    <div class="actions" style="margin-top:14px">
+      <button class="btn btn-r btn-s" id="btn-del-lez" style="display:none" onclick="deleteLezione()">🗑</button>
+      <button class="btn btn-o" onclick="hideSheet('sh-addlez')" style="flex:1">Annulla</button>
+      <button class="btn btn-p" onclick="saveLezione()" style="flex:1">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET: Programmata -->
+<div class="sheet-bg" id="sh-addprog" onclick="closeOnBg(event,this)">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sh-title">Aggiungi all'agenda</div>
+    <div class="fg"><label>Alunno</label><select class="fc" id="p-alunno"><option value="">Scegli alunno...</option></select></div>
+    <div class="row2">
+      <div class="fg"><label>Data</label><input class="fc" id="p-data" type="date"></div>
+      <div class="fg"><label>Ora (opz.)</label><input class="fc" id="p-ora" type="time"></div>
+    </div>
+    <div class="fg"><label>Note (opzionale)</label><input class="fc" id="p-note" placeholder="Es. Recupero"></div>
+    <div class="actions">
+      <button class="btn btn-o" onclick="hideSheet('sh-addprog')" style="flex:1">Annulla</button>
+      <button class="btn btn-p" onclick="saveProg()" style="flex:1">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET: Trasferisci -->
+<div class="sheet-bg" id="sh-trasf" onclick="closeOnBg(event,this)">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sh-title" id="trasf-title">Lezione fatta!</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:15px">Inserisci le ore per aggiungere al registro.</p>
+    <input type="hidden" id="trasf-id">
+    <div class="fg"><label>Ore effettuate</label><input class="fc" id="trasf-ore" type="number" step="0.5" placeholder="Es. 1.5"></div>
+    <div class="actions">
+      <button class="btn btn-o" onclick="hideSheet('sh-trasf')" style="flex:1">Annulla</button>
+      <button class="btn btn-p" onclick="trasferisci()" style="flex:1">✓ Aggiungi al registro</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET: Import/Export -->
+<div class="sheet-bg" id="sh-impexp" onclick="closeOnBg(event,this)">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sh-title">⚙️ Import / Export</div>
+    <div class="fg"><label>Importa da Excel (.xlsx)</label><input class="fc" type="file" id="imp-file" accept=".xlsx"></div>
+    <button class="btn btn-p btn-w" onclick="importExcel()" style="margin-bottom:10px">📥 Importa Excel</button>
+    <button class="btn btn-o btn-w" onclick="exportExcel()" style="margin-bottom:16px">📤 Esporta Excel</button>
+    <div style="padding-top:14px;border-top:1px solid var(--border)">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">⚠️ Cancella tutti i dati salvati</p>
+      <button class="btn btn-r btn-w btn-s" onclick="resetAll()">🗑 Cancella tutti i dati</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DB={
+  get(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return[]}},
+  set(k,v){localStorage.setItem(k,JSON.stringify(v))},
+  nextId(arr){return arr.length?Math.max(...arr.map(x=>x.id||0))+1:1}
+};
+const alunni=()=>DB.get('alunni');
+const lezioni=()=>DB.get('lezioni');
+const programmate=()=>DB.get('programmate');
+const getA=id=>alunni().find(a=>a.id==id)||{nome:'?',tariffa:0};
+const today=()=>new Date().toISOString().split('T')[0];
+const normDate=d=>{
+  if(!d) return '';
+  if(typeof d==='string'){
+    // Se è già YYYY-MM-DD, ok
+    if(/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+    // Se è DD/MM/YYYY
+    if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(d)){
+      const p=d.split('/');return`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+    }
+    // Se è MM/DD/YYYY (americano)
+    if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(d)){
+      const p=d.split('/');return`${p[2]}-${p[0].padStart(2,'0')}-${p[1].padStart(2,'0')}`;
+    }
+  }
+  return d;
+};
+const fmtD=d=>{if(!d)return'';const p=d.split('-');return`${(p[2]||'').padStart(2,'0')}/${(p[1]||'').padStart(2,'0')}`};
+const fmtOre=o=>{if(!o&&o!==0)return'';const n=parseFloat(o);return Number.isInteger(n)?n+'h':n+'h'};
+const MESI=['','Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+
+function goTo(name,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('s-'+name).classList.add('on');
+  btn.classList.add('on');
+  if(name==='home')renderHome();
+  if(name==='alunni')renderAlunni();
+  if(name==='lezioni')renderLezioni();
+  if(name==='agenda')renderAgenda();
+  if(name==='report')renderReport();
+}
+function showSheet(id){fillSels();document.getElementById(id).classList.add('on')}
+function hideSheet(id){document.getElementById(id).classList.remove('on')}
+function closeOnBg(e,el){if(e.target===el)el.classList.remove('on')}
+function showTab(id,chip){
+  document.getElementById('r-mens').style.display=id==='r-mens'?'block':'none';
+  document.getElementById('r-pag').style.display=id==='r-pag'?'block':'none';
+  document.querySelectorAll('#s-report .chip').forEach(c=>c.classList.remove('on'));
+  chip.classList.add('on');
+  if(id==='r-pag')renderPagare();
+}
+function flash(msg,type='ok'){
+  const a=document.getElementById('flash-area');
+  const d=document.createElement('div');
+  d.className='flash '+type;d.textContent=msg;a.appendChild(d);
+  setTimeout(()=>d.remove(),3000);
+}
+function fillSels(){
+  const al=alunni();
+  ['l-alunno','p-alunno'].forEach(id=>{
+    const s=document.getElementById(id);if(!s)return;
+    const v=s.value;
+    s.innerHTML='<option value="">Scegli alunno...</option>';
+    al.forEach(a=>s.innerHTML+=`<option value="${a.id}">${a.nome}</option>`);
+    if(v)s.value=v;
+  });
+}
+
+// ── ALUNNI ──────────────────────────────────────────────────────────────────
+function renderAlunni(){
+  const al=alunni();const lz=lezioni();
+  const el=document.getElementById('alunni-list');
+  if(!al.length){el.innerHTML='<div class="empty"><div class="ei">👥</div><p>Nessun alunno. Aggiungine uno!</p></div>';return}
+  el.innerHTML=al.map(a=>{
+    const dp=lz.filter(l=>l.alunno_id==a.id&&!l.pagato&&l.ore).reduce((s,l)=>s+l.ore*a.tariffa,0);
+    return`<div class="li">
+      <div class="av">${a.nome[0].toUpperCase()}</div>
+      <div class="in"><div class="nm">${a.nome}</div>
+      <div class="sb">€${a.tariffa}/h${a.materia?' · '+a.materia:''}</div>
+      ${dp>0?`<span class="bdg br" style="display:inline-block;margin-top:4px">€${dp.toFixed(0)} da incassare</span>`:''}
+      </div>
+      <button class="btn btn-o btn-s" onclick="editAlunno(${a.id})">✏️</button>
+    </div>`;
+  }).join('');
+}
+function editAlunno(id){
+  const a=getA(id);
+  document.getElementById('alunno-sh-title').textContent='Modifica alunno';
+  document.getElementById('edit-alunno-id').value=id;
+  document.getElementById('a-nome').value=a.nome;
+  document.getElementById('a-tariffa').value=a.tariffa;
+  document.getElementById('a-materia').value=a.materia||'';
+  document.getElementById('btn-del-alunno').style.display='inline-flex';
+  showSheet('sh-addalunno');
+}
+function saveAlunno(){
+  const nome=document.getElementById('a-nome').value.trim();
+  const tariffa=parseFloat(document.getElementById('a-tariffa').value);
+  if(!nome||!tariffa){flash('Nome e tariffa obbligatori','err');return}
+  const materia=document.getElementById('a-materia').value.trim();
+  const id=document.getElementById('edit-alunno-id').value;
+  let al=alunni();
+  if(id){al=al.map(a=>a.id==id?{...a,nome,tariffa,materia}:a)}
+  else al.push({id:DB.nextId(al),nome,tariffa,materia,attivo:1});
+  DB.set('alunni',al);
+  hideSheet('sh-addalunno');
+  resetAF();renderAlunni();flash(`${nome} salvato!`);
+}
+function deleteAlunno(){
+  const id=document.getElementById('edit-alunno-id').value;
+  if(!confirm('Eliminare alunno e tutte le sue lezioni?'))return;
+  DB.set('alunni',alunni().filter(a=>a.id!=id));
+  DB.set('lezioni',lezioni().filter(l=>l.alunno_id!=id));
+  DB.set('programmate',programmate().filter(p=>p.alunno_id!=id));
+  hideSheet('sh-addalunno');resetAF();renderAlunni();flash('Eliminato.');
+}
+function resetAF(){
+  document.getElementById('alunno-sh-title').textContent='Nuovo alunno';
+  document.getElementById('edit-alunno-id').value='';
+  document.getElementById('a-nome').value='';
+  document.getElementById('a-tariffa').value='';
+  document.getElementById('a-materia').value='';
+  document.getElementById('btn-del-alunno').style.display='none';
+}
+
+// ── LEZIONI ──────────────────────────────────────────────────────────────────
+let lFA='',lFP='';
+function renderLezioni(){
+  const al=alunni();
+  document.getElementById('lez-chips').innerHTML=`
+    <div class="chip ${!lFA&&!lFP?'on':''}" onclick="setLF('','',this)">Tutte</div>
+    <div class="chip ${lFP==='no'?'on':''}" onclick="setLF('','no',this)">Da pagare</div>
+    <div class="chip ${lFP==='si'?'on':''}" onclick="setLF('','si',this)">Pagate</div>
+    ${al.map(a=>`<div class="chip ${lFA==a.id?'on':''}" onclick="setLF(${a.id},'',this)">${a.nome}</div>`).join('')}`;
+  let lz=lezioni();
+  if(lFA)lz=lz.filter(l=>l.alunno_id==lFA);
+  if(lFP==='no')lz=lz.filter(l=>!l.pagato);
+  if(lFP==='si')lz=lz.filter(l=>l.pagato);
+  lz=[...lz].sort((a,b)=>b.data.localeCompare(a.data));
+  const el=document.getElementById('lez-list');
+  if(!lz.length){el.innerHTML='<div class="empty"><div class="ei">📚</div><p>Nessuna lezione.</p></div>';return}
+  el.innerHTML=lz.map(l=>{
+    const a=getA(l.alunno_id);const imp=l.ore?l.ore*a.tariffa:null;
+    return`<div class="li">
+      <div class="av" style="background:${l.pagato?'var(--gl)':'var(--rl)'};color:${l.pagato?'var(--gd)':'var(--r)'}">${l.pagato?'✅':'⏳'}</div>
+      <div class="in">
+        <div class="nm">${a.nome}${!l.ore?' <span style="color:var(--o);font-size:11px">• ore mancanti</span>':''}</div>
+        <div class="sb">${fmtD(l.data)}${l.ora?' '+l.ora:''}${l.ore?' — '+fmtOre(l.ore):''}${l.note?' — '+l.note:''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+        ${imp?`<span class="bdg ${l.pagato?'bg':'br'}">€${imp.toFixed(0)}</span>`:''}
+        <button class="btn btn-s" style="background:#f5f5f5;color:#666;font-size:12px;padding:5px 9px" onclick="editLezione(${l.id})">✏️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function setLF(a,p,chip){lFA=a;lFP=p;renderLezioni()}
+function editLezione(id){
+  const l=lezioni().find(x=>x.id==id);if(!l)return;
+  document.getElementById('lez-sh-title').textContent='Modifica lezione';
+  document.getElementById('edit-lez-id').value=id;
+  document.getElementById('l-alunno').value=l.alunno_id;
+  document.getElementById('l-data').value=l.data;
+  document.getElementById('l-ora').value=l.ora||'';
+  document.getElementById('l-ore').value=l.ore||'';
+  document.getElementById('l-note').value=l.note||'';
+  document.getElementById('l-pagato').checked=!!l.pagato;
+  document.getElementById('btn-del-lez').style.display='inline-flex';
+  showSheet('sh-addlez');
+}
+function saveLezione(){
+  const aid=document.getElementById('l-alunno').value;
+  const data=document.getElementById('l-data').value;
+  if(!aid||!data){flash('Seleziona alunno e data','err');return}
+  const ore=document.getElementById('l-ore').value;
+  const id=document.getElementById('edit-lez-id').value;
+  let lz=lezioni();
+  const obj={alunno_id:parseInt(aid),data,ora:document.getElementById('l-ora').value,
+    ore:ore?parseFloat(ore):null,note:document.getElementById('l-note').value,
+    pagato:document.getElementById('l-pagato').checked?1:0};
+  if(id)lz=lz.map(l=>l.id==id?{...obj,id:parseInt(id)}:l);
+  else lz.push({...obj,id:DB.nextId(lz)});
+  DB.set('lezioni',lz);
+  hideSheet('sh-addlez');resetLF();renderLezioni();flash('Lezione salvata!');
+}
+function deleteLezione(){
+  const id=document.getElementById('edit-lez-id').value;
+  DB.set('lezioni',lezioni().filter(l=>l.id!=id));
+  hideSheet('sh-addlez');resetLF();renderLezioni();flash('Eliminata.');
+}
+function resetLF(){
+  document.getElementById('lez-sh-title').textContent='Nuova lezione';
+  document.getElementById('edit-lez-id').value='';
+  ['l-alunno','l-ora','l-ore','l-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('l-data').value=today();
+  document.getElementById('l-pagato').checked=false;
+  document.getElementById('btn-del-lez').style.display='none';
+}
+
+// ── AGENDA ──────────────────────────────────────────────────────────────────
+function renderAgenda(){
+  const prog=[...programmate()].sort((a,b)=>a.data.localeCompare(b.data));
+  const el=document.getElementById('prog-list');
+  if(!prog.length){el.innerHTML='<div class="empty"><div class="ei">📅</div><p>Nessuna lezione in agenda.</p></div>';return}
+  el.innerHTML=prog.map(p=>{
+    const a=getA(p.alunno_id);
+    return`<div class="li">
+      <div class="av">📅</div>
+      <div class="in"><div class="nm">${a.nome}</div>
+      <div class="sb">${fmtD(p.data)}${p.ora?' ore '+p.ora:''}${p.note?' — '+p.note:''}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-p btn-s" onclick="showTrasf(${p.id},'${a.nome}')">✓</button>
+        <button class="btn btn-r btn-s" onclick="delProg(${p.id})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function saveProg(){
+  const aid=document.getElementById('p-alunno').value;
+  const data=document.getElementById('p-data').value;
+  if(!aid||!data){flash('Seleziona alunno e data','err');return}
+  let prog=programmate();
+  prog.push({id:DB.nextId(prog),alunno_id:parseInt(aid),data,
+    ora:document.getElementById('p-ora').value,note:document.getElementById('p-note').value});
+  DB.set('programmate',prog);
+  hideSheet('sh-addprog');
+  ['p-alunno','p-ora','p-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('p-data').value=today();
+  renderAgenda();flash("Aggiunto all'agenda!");
+}
+function delProg(id){DB.set('programmate',programmate().filter(p=>p.id!=id));renderAgenda()}
+function showTrasf(id,nome){
+  document.getElementById('trasf-title').textContent='✓ Lezione di '+nome;
+  document.getElementById('trasf-id').value=id;
+  document.getElementById('trasf-ore').value='';
+  showSheet('sh-trasf');
+}
+function trasferisci(){
+  const id=document.getElementById('trasf-id').value;
+  const ore=document.getElementById('trasf-ore').value;
+  if(!ore){flash('Inserisci le ore','err');return}
+  const p=programmate().find(x=>x.id==id);if(!p)return;
+  let lz=lezioni();
+  lz.push({id:DB.nextId(lz),alunno_id:p.alunno_id,data:p.data,
+    ora:p.ora,ore:parseFloat(ore),note:p.note,pagato:0});
+  DB.set('lezioni',lz);
+  DB.set('programmate',programmate().filter(x=>x.id!=id));
+  hideSheet('sh-trasf');renderAgenda();flash('Aggiunta al registro!');
+}
+
+// ── REPORT ──────────────────────────────────────────────────────────────────
+function renderReport(){
+  const lz=lezioni().filter(l=>l.ore);
+  const mSet=new Set(lz.map(l=>l.data.substring(0,7)));
+  const mesi=[...mSet].sort().reverse();
+  const sel=document.getElementById('mese-sel');
+  const cur=sel.value;
+  sel.innerHTML=mesi.map(m=>`<option value="${m}">${MESI[parseInt(m.split('-')[1])]} ${m.split('-')[0]}</option>`).join('');
+  if(cur&&mesi.includes(cur))sel.value=cur;
+  renderMensile();renderPagare();
+}
+function renderMensile(){
+  const m=document.getElementById('mese-sel').value;
+  if(!m){document.getElementById('mensile-content').innerHTML='';return}
+  const lz=lezioni().filter(l=>l.ore&&l.data.startsWith(m));
+  const [anno,mese]=m.split('-');
+  const al=alunni();
+  let html='',gt=0,gd=0,gp=0;
+  al.forEach(a=>{
+    const lza=lz.filter(l=>l.alunno_id==a.id);if(!lza.length)return;
+    const oT=lza.reduce((s,l)=>s+l.ore,0);
+    const oNP=lza.filter(l=>!l.pagato).reduce((s,l)=>s+l.ore,0);
+    const gu=oT*a.tariffa,dp=oNP*a.tariffa,pa=gu-dp;
+    gt+=gu;gd+=dp;gp+=pa;
+    html+=`<div class="card" style="margin-top:0;margin-bottom:8px">
+      <div style="font-size:15px;font-weight:700;margin-bottom:10px">${a.nome}</div>
+      <div class="mon-row"><span class="ml">Ore fatte</span><span class="mv">${fmtOre(oT)}</span></div>
+      <div class="mon-row"><span class="ml">Guadagno</span><span class="mv">€${gu.toFixed(2)}</span></div>
+      <div class="mon-row"><span class="ml">Già pagato</span><span class="mv gr">€${pa.toFixed(2)}</span></div>
+      <div class="mon-row"><span class="ml">Da incassare</span><span class="mv re">€${dp.toFixed(2)}</span></div>
+      ${oNP>0?`<div class="mon-row"><span class="ml">Ore da pagare</span><span class="mv re">${fmtOre(oNP)}</span></div>`:''}
+    </div>`;
+  });
+  html+=`<div class="card" style="background:var(--g);margin-top:0">
+    <div style="color:#fff;font-weight:700;font-size:14px;margin-bottom:10px">TOTALE ${MESI[parseInt(mese)].toUpperCase()} ${anno}</div>
+    <div class="mon-row" style="border-color:rgba(255,255,255,.2)"><span style="color:rgba(255,255,255,.8)">Guadagno</span><span style="color:#fff;font-weight:700">€${gt.toFixed(2)}</span></div>
+    <div class="mon-row" style="border-color:rgba(255,255,255,.2)"><span style="color:rgba(255,255,255,.8)">Da incassare</span><span style="color:#ffcdd2;font-weight:700">€${gd.toFixed(2)}</span></div>
+    <div class="mon-row" style="border:none"><span style="color:rgba(255,255,255,.8)">Incassato</span><span style="color:#c8e6c9;font-weight:700">€${gp.toFixed(2)}</span></div>
+  </div>`;
+  document.getElementById('mensile-content').innerHTML=html||'<div class="empty"><div class="ei">📅</div><p>Nessuna lezione in questo mese.</p></div>';
+}
+function renderPagare(){
+  const al=alunni();const lz=lezioni();let html='';
+  al.forEach(a=>{
+    const lzNP=lz.filter(l=>l.alunno_id==a.id&&!l.pagato&&l.ore).sort((x,y)=>x.data.localeCompare(y.data));
+    if(!lzNP.length)return;
+    const tO=lzNP.reduce((s,l)=>s+l.ore,0);
+    const tI=tO*a.tariffa;
+    const waTxt=lzNP.map(l=>`• ${fmtD(l.data)} — ${fmtOre(l.ore)}`).join('\n');
+    const wId='wa'+a.id;
+    html+=`<div class="card" style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px">
+        <span style="font-size:15px;font-weight:700">${a.nome}</span>
+        <span class="bdg br">€${tI.toFixed(2)}</span>
+      </div>
+      ${lzNP.map(l=>`<div class="mon-row">
+        <span class="ml">${fmtD(l.data)}${l.ora?' '+l.ora:''}${l.note?' · '+l.note:''}</span>
+        <span class="mv">${fmtOre(l.ore)} · €${(l.ore*a.tariffa).toFixed(0)}</span>
+      </div>`).join('')}
+      <div style="margin-top:12px;padding-top:12px;border-top:2px solid var(--rl)">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:7px">📱 TESTO PER WHATSAPP</div>
+        <div class="wa-box" id="${wId}">${waTxt}</div>
+        <button class="btn btn-o btn-w btn-s" style="margin-top:9px" onclick="copyWA('${wId}')">📋 Copia per WhatsApp</button>
+        <button class="btn btn-p btn-w btn-s" style="margin-top:6px" onclick="segnaP(${a.id})">✅ Segna tutto come pagato</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('pagare-content').innerHTML=html||'<div class="empty"><div class="ei">🎉</div><p>Tutto pagato!</p></div>';
+}
+function segnaP(aid){
+  if(!confirm('Segnare tutto come pagato?'))return;
+  DB.set('lezioni',lezioni().map(l=>l.alunno_id==aid&&!l.pagato?{...l,pagato:1}:l));
+  renderPagare();renderMensile();flash('Segnato come pagato!');
+}
+function copyWA(id){
+  const t=document.getElementById(id).innerText;
+  if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>flash('Copiato! Incolla su WhatsApp.'));
+  else{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);flash('Copiato!');}
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────
+function renderHome(){
+  const al=alunni();const lz=lezioni();const prog=programmate();
+  document.getElementById('h-nalunni').textContent=al.filter(a=>a.attivo).length;
+  const dp=lz.filter(l=>!l.pagato&&l.ore).reduce((s,l)=>s+l.ore*(getA(l.alunno_id).tariffa||0),0);
+  document.getElementById('h-dpag').textContent='€'+dp.toFixed(0);
+  const oggi=today();
+  const pross=[...prog].filter(p=>p.data>=oggi).sort((a,b)=>a.data.localeCompare(b.data)).slice(0,3);
+  const pc=document.getElementById('h-prog-card');
+  pc.innerHTML=pross.length?pross.map(p=>{const a=getA(p.alunno_id);return`<div class="li">
+    <div class="av">📅</div><div class="in"><div class="nm">${a.nome}</div>
+    <div class="sb">${fmtD(p.data)}${p.ora?' ore '+p.ora:''}${p.note?' — '+p.note:''}</div></div>
+  </div>`;}).join('')+'<button class="btn btn-o btn-w" style="margin-top:10px;font-size:13px" onclick="navTo(\'agenda\',3)">Vedi tutte →</button>':
+  '<div class="empty"><div class="ei">📅</div><p>Nessuna lezione programmata</p></div>';
+  const ultime=[...lz].sort((a,b)=>b.data.localeCompare(a.data)).slice(0,5);
+  const lc=document.getElementById('h-lez-card');
+  lc.innerHTML=ultime.length?ultime.map(l=>{
+    const a=getA(l.alunno_id);const imp=l.ore?l.ore*(a.tariffa||0):null;
+    return`<div class="li">
+      <div class="av" style="background:${l.pagato?'var(--gl)':'var(--rl)'}">${l.pagato?'✅':'⏳'}</div>
+      <div class="in"><div class="nm">${a.nome}</div><div class="sb">${fmtD(l.data)}${l.ore?' — '+fmtOre(l.ore):''}</div></div>
+      ${imp?`<span class="bdg ${l.pagato?'bg':'br'}">€${imp.toFixed(0)}</span>`:''}
+    </div>`;
+  }).join('')+'<button class="btn btn-o btn-w" style="margin-top:10px;font-size:13px" onclick="navTo(\'lezioni\',2)">Vedi tutte →</button>':
+  '<div class="empty"><div class="ei">📚</div><p>Nessuna lezione ancora</p></div>';
+}
+function navTo(name,idx){goTo(name,document.querySelectorAll('.nav-btn')[idx])}
+
+// ── IMPORT/EXPORT ──────────────────────────────────────────────────────────
+async function importExcel(){
+  const file=document.getElementById('imp-file').files[0];
+  if(!file){flash('Seleziona un file','err');return}
+  try{
+    const XLSX=window.XLSX;
+    const data=await file.arrayBuffer();
+    // cellDates:true -> date come oggetti JS Date in ora locale
+    const wb=XLSX.read(data,{type:'array',cellDates:true});
+    let al=alunni();let lz=lezioni();let prog=programmate();
+    const alMap={};
+
+    // Funzione per convertire data in YYYY-MM-DD usando ora LOCALE (non UTC)
+    const toDS=d=>{
+      if(!d) return '';
+      if(d instanceof Date){
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      }
+      if(typeof d==='string'){
+        // Già YYYY-MM-DD
+        if(/^\d{4}-\d{2}-\d{2}/.test(d)) return d.substring(0,10);
+        // DD/MM/YYYY
+        const p=d.split('/');
+        if(p.length===3 && p[2].length===4) return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+      }
+      return String(d).substring(0,10);
+    };
+
+    // ALUNNI
+    if(wb.SheetNames.includes('Alunni')){
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets['Alunni'],{range:2,defval:''});
+      rows.forEach(r=>{
+        const keys=Object.keys(r);
+        const nome=String(r['Nome Alunno']||r[keys[0]]||'').trim();
+        const tariffa=parseFloat(r['Tariffa Oraria (€)']||r[keys[1]]||0);
+        if(!nome||!tariffa) return;
+        let ex=al.find(a=>a.nome===nome);
+        if(!ex){ex={id:DB.nextId(al),nome,tariffa,materia:String(r['Materia / Note']||''),attivo:1};al.push(ex);}
+        alMap[nome]=ex.id;
+      });
+    }
+
+    // LEZIONI
+    let imp=0;
+    if(wb.SheetNames.includes('Lezioni')){
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets['Lezioni'],{range:2,defval:''});
+      rows.forEach(r=>{
+        const keys=Object.keys(r);
+        const dv=r['Data']||r[keys[0]];
+        const nv=r['Nome Alunno']||r[keys[2]];
+        const ov=r['Ore']||r[keys[3]];
+        const pv=r['Pagato?']||r[keys[7]]||'';
+        if(!dv||!nv) return;
+        const ds=toDS(dv);
+        if(!ds) return;
+        const aid=alMap[String(nv).trim()];
+        if(!aid) return;
+        const ore=ov?parseFloat(String(ov).replace('h','').trim()):null;
+        const oraVal=r['Ora']||r[keys[1]]||'';
+        let oraStr='';
+        if(oraVal instanceof Date) oraStr=`${String(oraVal.getHours()).padStart(2,'0')}:${String(oraVal.getMinutes()).padStart(2,'0')}`;
+        else oraStr=String(oraVal||'');
+        lz.push({id:DB.nextId(lz),alunno_id:aid,data:ds,
+          ora:oraStr,ore,note:r['Note / Argomento']||r['Note']||'',
+          pagato:String(pv).toLowerCase().includes('s')?1:0});
+        imp++;
+      });
+    }
+
+    // PROGRAMMATE
+    let pimp=0;
+    if(wb.SheetNames.includes('Programmate')){
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets['Programmate'],{range:2,defval:''});
+      rows.forEach(r=>{
+        const keys=Object.keys(r);
+        const dv=r['Data']||r[keys[0]];
+        const nv=r['Alunno']||r[keys[2]];
+        if(!dv||!nv) return;
+        const ds=toDS(dv);
+        if(!ds) return;
+        const aid=alMap[String(nv).trim()];
+        if(!aid) return;
+        const oraVal=r['Ora']||r[keys[1]]||'';
+        let oraStr='';
+        if(oraVal instanceof Date) oraStr=`${String(oraVal.getHours()).padStart(2,'0')}:${String(oraVal.getMinutes()).padStart(2,'0')}`;
+        else oraStr=String(oraVal||'');
+        prog.push({id:DB.nextId(prog),alunno_id:aid,data:ds,
+          ora:oraStr,note:r['Note']||''});
+        pimp++;
+      });
+    }
+
+    DB.set('alunni',al);DB.set('lezioni',lz);DB.set('programmate',prog);
+    hideSheet('sh-impexp');renderHome();
+    flash(`Importati: ${Object.keys(alMap).length} alunni, ${imp} lezioni, ${pimp} programmate!`);
+  }catch(e){flash('Errore: '+e.message,'err')}
+}
+
+function exportExcel(){
+  const XLSX=window.XLSX;
+  const al=alunni();const lz=lezioni();const prog=programmate();
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(al.map(a=>({'Nome Alunno':a.nome,'Tariffa Oraria (€)':a.tariffa,'Materia / Note':a.materia||'','Attivo?':a.attivo?'Sì':'No'}))),'Alunni');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(lz.map(l=>{const a=getA(l.alunno_id);return{'Data':l.data,'Ora':l.ora||'','Nome Alunno':a.nome,'Ore':l.ore||'','Tariffa':a.tariffa,'Importo':l.ore?l.ore*a.tariffa:'','Note / Argomento':l.note||'','Pagato?':l.pagato?'Sì':'No'};})),'Lezioni');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(prog.map(p=>{const a=getA(p.alunno_id);return{'Data':p.data,'Ora':p.ora||'','Alunno':a.nome,'Note':p.note||''};})),'Programmate');
+  XLSX.writeFile(wb,`registro_${today()}.xlsx`);
+  flash('Excel scaricato!');
+}
+function resetAll(){
+  if(!confirm('Cancellare TUTTI i dati?'))return;
+  ['alunni','lezioni','programmate'].forEach(k=>localStorage.removeItem(k));
+  hideSheet('sh-impexp');renderHome();flash('Dati cancellati.');
+}
+
+// INIT
+document.getElementById('l-data').value=today();
+document.getElementById('p-data').value=today();
+renderHome();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</body>
+</html>
